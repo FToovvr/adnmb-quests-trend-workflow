@@ -1,25 +1,25 @@
-CREATE TABLE thread
-(
-    id INTEGER NOT NULL,
-    created_at_utc INTEGER NOT NULL,
-    user_id TEXT NOT NULL,
-    raw TEXT NOT NULL,
-
-    PRIMARY KEY(id)
-);
-
 CREATE TABLE post
 (
+    -- 为 NULL 代表是主串
+    parent_id INTEGER NULL,
+
     id INTEGER NOT NULL,
-    thread_id INTEGER NOT NULL,
-    created_at_utc INTEGER NOT NULL,
+    attachment_path TEXT NULL,
+    created_at_since_epoch INTEGER NOT NULL,
     user_id TEXT NOT NULL,
-    raw TEXT NOT NULL,
+    name TEXT NULL,
+    email TEXT NULL,
+    title TEXT NULL,
+    content TEXT NULL,
+    marked_sage INTEGER NOT NULL,
+    marked_admin INTEGER NOT NULL,
+    leftover_json TEXT NULL,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (thread_id) REFERENCES thread(id)
+    FOREIGN KEY (parent_id) REFERENCES post(id)
 );
-CREATE INDEX idx_post_thread_id ON post(thread_id);
+CREATE INDEX idx_post_created_at_since_epoch ON post(created_at_since_epoch);
+CREATE INDEX idx_post_parent_id ON post(parent_id);
 
 CREATE TABLE board_collected_datetime_range
 (
@@ -38,6 +38,6 @@ CREATE TABLE thread_collected_page_range
     to_page_max_post_id INTEGER,
 
     PRIMARY KEY (thread_id),
-    FOREIGN KEY (thread_id) REFERENCES thread(id),
+    FOREIGN KEY (thread_id) REFERENCES post(id),
     UNIQUE(thread_id, from_page)
 );
