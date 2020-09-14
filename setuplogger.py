@@ -24,10 +24,20 @@ def now_with_tz() -> pytz.datetime.datetime:
     return pytz.datetime.datetime.now(tz=tz)
 
 
-def setup_logger(name: str, base_log_folder_path: Path) -> logging.Logger:
-    pass
+__has_setup_root_logger = False
+__base_log_folder_path = None
 
-    logger = logging.getLogger(name)
+
+def __setup_aqt_root_logger(base_log_folder_path: Path):
+    global __has_setup_root_logger, __base_log_folder_path
+    if __has_setup_root_logger:
+        assert(__base_log_folder_path == base_log_folder_path)
+        return
+    else:
+        __has_setup_root_logger = True
+        __base_log_folder_path = base_log_folder_path
+
+    logger = logging.getLogger("AQT")
     logger.level = logging.DEBUG
 
     formatter = CustomLogFormatter(
@@ -38,15 +48,20 @@ def setup_logger(name: str, base_log_folder_path: Path) -> logging.Logger:
     consoleHandler.level = logging.DEBUG
     consoleHandler.formatter = formatter
 
-    log_folder_path = base_log_folder_path / name
-    os.makedirs(log_folder_path, exist_ok=True)
+    os.makedirs(base_log_folder_path, exist_ok=True)
 
     fileHandler = logging.FileHandler(
-        filename=log_folder_path / now_with_tz().strftime("%Y-%m-%d_%H-%M%S.log"))
+        filename=base_log_folder_path / now_with_tz().strftime("%Y-%m-%d_%H-%M%S.log"))
     fileHandler.level = logging.INFO
     fileHandler.formatter = formatter
 
     logger.addHandler(consoleHandler)
     logger.addHandler(fileHandler)
 
-    return logger
+
+def setup_aqt_logger(name: str, base_log_folder_path: Path) -> logging.Logger:
+    # AQT = adnmb_quests_trend
+
+    __setup_aqt_root_logger(base_log_folder_path)
+
+    return logging.getLogger(f"AQT.{name}")

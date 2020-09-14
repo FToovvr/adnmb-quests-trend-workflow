@@ -10,7 +10,7 @@ import logging
 import anobbsclient
 
 from commonargs import parse_args, Arguments
-from setuplogger import setup_logger
+from setuplogger import setup_aqt_logger
 
 import collect_posts
 from exceptions import QuitDueToTrendThreadRelatedIssueException
@@ -60,8 +60,8 @@ def main(args: List[str]):
         args_cls=RunWorkflowArguments,
         extra_args_fn=RunWorkflowArguments._parse_extra_args)
 
-    logger = setup_logger(
-        name="AQT.workflow",  # AQT = adnmb_quests_trend
+    logger = setup_aqt_logger(
+        name="workflow",  # AQT = adnmb_quests_trend
         base_log_folder_path=args.base_log_folder_path,
     )
 

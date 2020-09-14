@@ -7,7 +7,7 @@ import argparse
 import sys
 
 from commonargs import parse_args, Arguments
-from setuplogger import setup_logger
+from setuplogger import setup_aqt_logger
 
 
 @dataclass
@@ -28,8 +28,8 @@ def main(args: List[str]):
 
 def execute(args: CollectArguments):
 
-    logger = setup_logger(
-        name="AQT.collect",  # AQT = adnmb_quests_trend
+    logger = setup_aqt_logger(
+        name="collect",
         base_log_folder_path=args.base_log_folder_path,
     )
 
