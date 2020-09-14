@@ -6,6 +6,7 @@ from contextlib import contextmanager
 import argparse
 import sys
 import logging
+from datetime import datetime, timedelta
 
 import anobbsclient
 
@@ -13,7 +14,7 @@ from commonargs import parse_args, Arguments
 from setuplogger import setup_aqt_logger
 
 import collect_posts
-from exceptions import QuitDueToTrendThreadRelatedIssueException
+from exceptions import ShouldNotReachException, QuitDueToTrendThreadRelatedIssueException
 
 
 @dataclass
@@ -91,6 +92,15 @@ def main(args: List[str]):
         else:
             logger.info(f"未配置趋势串，跳过")
 
+    now = datetime.now(tz=args.time_zone)
+    if args.range in ("yesterday", "last-24-hours"):
+        time_since = (now - timedelta(days=1))
+        if args.range == "yesterday":
+            time_since = time_since.replace(
+                hour=0, minute=0, second=0, microsecond=0)
+    else:
+        raise ShouldNotReachException()
+
     with sm.next("采集跑团版"):
         collect_posts.execute(collect_posts.CollectArguments(
             board_id=args.board_id,
@@ -102,6 +112,7 @@ def main(args: List[str]):
             appid=args.appid,
             userhash=args.userhash,
             time_zone=args.time_zone,
+            time_since=time_since,
         ), client)
 
     logger.info(f"跑团版趋势工作流程：完成")
