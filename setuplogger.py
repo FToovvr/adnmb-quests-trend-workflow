@@ -4,9 +4,9 @@ from datetime import datetime
 from pathlib import Path
 import os
 
-import pytz
+from dateutil import tz
 
-tz = pytz.timezone("Asia/Shanghai")
+local_tz = tz.gettz("Asia/Shanghai")
 
 
 class CustomLogFormatter(logging.Formatter):
@@ -14,14 +14,13 @@ class CustomLogFormatter(logging.Formatter):
     def formatTime(self, record: logging.LogRecord, datefmt: str = None):
         assert(datefmt == None)
 
-        dt = datetime.fromtimestamp(record.created)
-        dt = tz.localize(dt)
+        dt = datetime.fromtimestamp(record.created, tz=local_tz)
 
         return dt.isoformat(timespec="milliseconds")
 
 
-def now_with_tz() -> pytz.datetime.datetime:
-    return pytz.datetime.datetime.now(tz=tz)
+def now_with_tz() -> datetime:
+    return datetime.now(tz=local_tz)
 
 
 __has_setup_root_logger = False
