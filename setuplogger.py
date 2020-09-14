@@ -1,33 +1,29 @@
 import logging
 
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import os
-
-from dateutil import tz
-
-local_tz = tz.gettz("Asia/Shanghai")
 
 
 class CustomLogFormatter(logging.Formatter):
 
+    def __init__(self, *args, tz: timezone, **kwargs):
+        super(CustomLogFormatter, self).__init__(*args, **kwargs)
+        self.time_zone = tz
+
     def formatTime(self, record: logging.LogRecord, datefmt: str = None):
         assert(datefmt == None)
 
-        dt = datetime.fromtimestamp(record.created, tz=local_tz)
+        dt = datetime.fromtimestamp(record.created, tz=self.time_zone)
 
         return dt.isoformat(timespec="milliseconds")
-
-
-def now_with_tz() -> datetime:
-    return datetime.now(tz=local_tz)
 
 
 __has_setup_root_logger = False
 __base_log_folder_path = None
 
 
-def __setup_aqt_root_logger(base_log_folder_path: Path):
+def __setup_aqt_root_logger(base_log_folder_path: Path, tz: timezone):
     global __has_setup_root_logger, __base_log_folder_path
     if __has_setup_root_logger:
         assert(__base_log_folder_path == base_log_folder_path)
@@ -41,6 +37,7 @@ def __setup_aqt_root_logger(base_log_folder_path: Path):
 
     formatter = CustomLogFormatter(
         '[%(asctime)s] @%(name)s #%(levelname)s: %(message)s',
+        tz=tz,
     )
 
     consoleHandler = logging.StreamHandler()
@@ -50,7 +47,7 @@ def __setup_aqt_root_logger(base_log_folder_path: Path):
     os.makedirs(base_log_folder_path, exist_ok=True)
 
     fileHandler = logging.FileHandler(
-        filename=base_log_folder_path / now_with_tz().strftime("%Y-%m-%d_%H-%M%S.log"))
+        filename=base_log_folder_path / datetime.now(tz=tz).strftime("%Y-%m-%d_%H-%M%S.log"))
     fileHandler.level = logging.INFO
     fileHandler.formatter = formatter
 
@@ -58,9 +55,9 @@ def __setup_aqt_root_logger(base_log_folder_path: Path):
     logger.addHandler(fileHandler)
 
 
-def setup_aqt_logger(name: str, base_log_folder_path: Path) -> logging.Logger:
+def setup_aqt_logger(name: str, base_log_folder_path: Path, tz: timezone) -> logging.Logger:
     # AQT = adnmb_quests_trend
 
-    __setup_aqt_root_logger(base_log_folder_path)
+    __setup_aqt_root_logger(base_log_folder_path, tz)
 
     return logging.getLogger(f"AQT.{name}")

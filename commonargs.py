@@ -4,6 +4,9 @@ from dataclasses import dataclass
 import argparse
 from pathlib import Path
 import os
+from datetime import timezone
+
+from dateutil import tz
 
 
 @dataclass
@@ -19,6 +22,8 @@ class Arguments:
     host: str
     appid: Optional[str]
     userhash: str
+
+    time_zone: timezone
 
     def __str__(self) -> str:
         fields = dict(self.__dict__)
@@ -69,4 +74,6 @@ def parse_args(
         host=host,
         appid=appid,
         userhash=userhash,
+
+        time_zone=tz.gettz("Asia/Shanghai"),
     )

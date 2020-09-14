@@ -63,6 +63,7 @@ def main(args: List[str]):
     logger = setup_aqt_logger(
         name="workflow",  # AQT = adnmb_quests_trend
         base_log_folder_path=args.base_log_folder_path,
+        tz=args.time_zone,
     )
 
     logger.info(f"输入参数：{args}")
@@ -100,6 +101,7 @@ def main(args: List[str]):
             host=args.host,
             appid=args.appid,
             userhash=args.userhash,
+            time_zone=args.time_zone,
         ), client)
 
     logger.info(f"跑团版趋势工作流程：完成")

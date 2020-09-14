@@ -44,6 +44,7 @@ def execute(args: CollectArguments, client: anobbsclient.Client):
     logger = setup_aqt_logger(
         name="collect",
         base_log_folder_path=args.base_log_folder_path,
+        tz=args.time_zone,
     )
 
     logger.info("test")
