@@ -100,7 +100,7 @@ def main(args: List[str]):
             host=args.host,
             appid=args.appid,
             userhash=args.userhash,
-        ))
+        ), client)
 
     logger.info(f"跑团版趋势工作流程：完成")
 

@@ -9,6 +9,8 @@ import sys
 from commonargs import parse_args, Arguments
 from setuplogger import setup_aqt_logger
 
+import anobbsclient
+
 
 @dataclass
 class CollectArguments(Arguments):
@@ -23,10 +25,21 @@ def main(args: List[str]):
         args_cls=CollectArguments,
     )
 
-    execute(args)
+    client = anobbsclient.Client(
+        user_agent=args.user_agent,
+        host=args.host,
+        appid=args.appid,
+        default_request_options={
+            "user_cookie": anobbsclient.UserCookie(
+                userhash=args.userhash,
+            ),
+        },
+    )
+
+    execute(args, client)
 
 
-def execute(args: CollectArguments):
+def execute(args: CollectArguments, client: anobbsclient.Client):
 
     logger = setup_aqt_logger(
         name="collect",
